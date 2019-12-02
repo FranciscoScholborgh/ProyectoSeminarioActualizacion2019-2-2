@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<definitions name="WatchDogService" 
+    targetNamespace="urn:WatchDogService"
+     xmlns:tns="urn:WatchDogService"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+     xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+     xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/"
+     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+     xmlns="http://schemas.xmlsoap.org/wsdl/">
+
+  <message name="UpdateStatusRequest">
+    <part name="sensorRef" type="xsd:string" />
+    <part name="status" type="xsd:string" />
+  </message>
+
+  <message name="UpdateStatusAnswer">
+    <part name="respuesta" type="xsd:boolean" />
+  </message>
+
+  <portType name="UpdatePort">
+    <operation name="updateStatus">
+      <input message="tns:UpdateStatusRequest" />
+      <output message="tns:UpdateStatusAnswer" />
+    </operation>
+  </portType>
+
+  <binding name="UpdateBinding" type="tns:UpdatePort">
+    <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="updateStatus">
+        <soap:operation soapAction="urn:WatchDogService#updateStatus" />
+        <input>
+          <soap:body use="encoded" namespace="urn:WatchDogService"
+                     encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+        </input>
+        <output>
+          <soap:body use="encoded" namespace="urn:WatchDogService"
+                     encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" />
+        </output>
+    </operation>
+  </binding>
+
+  <service name="AritmeticaServicio">
+    <port name="UpdatePort" binding="tns:UpdateBinding">
+      <soap:address location="http://localhost/SemAct-2/watchDogSoap.php" />
+    </port>
+  </service>
+</definitions>
