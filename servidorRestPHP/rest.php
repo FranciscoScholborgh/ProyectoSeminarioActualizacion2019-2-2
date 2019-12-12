@@ -1,17 +1,32 @@
 <?php
 
-    require_once('arduinoStatusdb.php');
-    include "dbUtils.php";
-    $dbConn =  connect($db);
-
     if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         if (isset($_GET['device'])) {
-            $algo = $_GET['device'];
-            $sql = $dbConn->prepare("SELECT * FROM devices where device='$algo'");
-            $sql->bindValue(':device', $_GET['device']);
-            $sql->execute();
-            header("HTTP/1.1 200 OK");
-            echo json_encode(  $sql->fetch(PDO::FETCH_ASSOC)  );
+            $sensorRef = $_GET['device'];
+            $rdbUrl = "https://seminarioact-b1b0a.firebaseio.com/devices.json";
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $rdbUrl);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER , true);
+
+            $response = curl_exec($ch);
+
+            $data = json_decode($response, true);
+
+            $result = '';
+            $sensorData;
+            foreach($data as $key => $value) {
+                if (strcmp($data[$key]["device"], $sensorRef) == 0) {
+                    $sensorData = $data[$key];
+                    $result = true;
+                    break;
+                }
+            } 
+            
+            if($result) {
+                header("HTTP/1.1 200 OK");
+                echo json_encode($sensorData, true);
+            } 
+            curl_close($ch);
             exit();
         } 
     }

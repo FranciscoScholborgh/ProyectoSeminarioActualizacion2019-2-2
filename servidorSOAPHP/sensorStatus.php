@@ -10,18 +10,27 @@
     $server = new SoapServer("sensorStatus.wsdl");
 
     function getSensorStatus($sensorRef) {
-        $db = new SensorStatusDBHandler;
-        $sql = "SELECT `status` FROM `devices` WHERE device = '$sensorRef'";
-        $result = $db-> request($sql);
-        if($result){
-            $codex = $result->fetch_assoc();
-            return $codex['status'];
-        } else {
-            return '';
+        $rdbUrl = "https://seminarioact-b1b0a.firebaseio.com/devices.json";
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $rdbUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER , true);
+
+        $response = curl_exec($ch);
+
+        $data = json_decode($response, true);
+
+        $result = '';
+        foreach($data as $key => $value) {
+            if (strcmp($data[$key]["device"], $sensorRef) == 0) {
+                $result = $data[$key]["status"];
+                break;
+            }
         }
+        curl_close($ch);
+        return $result;
     }
 
-    getSensorStatus("MC-38");
+    echo getSensorStatus("MC-38");
 
     $server->AddFunction("getSensorStatus");
     $server->handle();
