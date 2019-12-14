@@ -108,6 +108,9 @@ class SerialArduino(Arduino, Subject):
                     self.serialCommunication = serial.Serial(self.port, self.baud)
                 except:
                     print("Reconecting...")
+                    if (self.estado_anterior[0] != "UNKNOWN" and self.estado_anterior[1] != "SHUTDOWN"):
+                        self.estado_anterior[1] = "SHUTDOWN"
+                        self.notify()
                     time.sleep(0.25)
         self.serialCommunication.close()
         self.estado_anterior[1] = "SHUTDOWN"
